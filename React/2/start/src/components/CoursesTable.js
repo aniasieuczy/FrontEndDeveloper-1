@@ -1,19 +1,44 @@
-import { useEffect, useState } from "react";
-import { getCourses } from "../api/heroesApi";
+import { useEffect } from "react";
+import { deleteCourse } from "../api/coursesApi";
 import "../styles/logo.css";
+import "../styles/buttons.css";
+import Star from "../components/Star";
+import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { loadCourses, toggleShowImage } from "../redux/actions/courseActions";
+
 
 const CoursesTable = () => {
-  const [courses, setCourses] = useState([]);
-  const [showImage, setShowImage] = useState(false);
+  const dispatch = useDispatch();
+  // const [courses, setCourses] = useState([]);
+  // const [showImage, setShowImage] = useState(false);
+  const showImage = useSelector(({courses}) => courses.showImage);
+  const courses = useSelector(({courses})=> courses.data);
 
   useEffect(() => {
-    getCourses().then((_heroes) => {
-      setCourses(_heroes);
-    });
+    getCoursesList();
   }, []);
 
   function onLogoButtonClick() {
-    setShowImage(!showImage);
+    dispatch(toggleShowImage());
+    // setShowImage(!showImage);
+  }
+
+  function onStarRatingClicked(rating) {
+    console.log(`Star został kliknięty z warrtością ${rating}`);
+  }
+
+  function getCoursesList() {
+    dispatch(loadCourses());
+    // getCourses().then((_courses) => {
+    //   setCourses(_courses);
+    // });
+  }
+
+  function deleteCourseById(courseId) {
+    deleteCourse(courseId).then(() => {
+     getCoursesList();
+    });
   }
 
   return (
@@ -37,12 +62,13 @@ const CoursesTable = () => {
             <th>Cena</th>
             <th>Czas trwania</th>
             <th>Ocena</th>
+            {/* <th></th> */}
           </tr>
         </thead>
         <tbody>
           {courses.map((course) => {
             return (
-              <tr>
+              <tr key={course.id}>
                 <td>
                   {showImage && (
                     <img
@@ -52,11 +78,20 @@ const CoursesTable = () => {
                     />
                   )}
                 </td>
-                <td>{course.name}</td>
+                <td><Link to={"/course-details/" + course.id }>{course.name}</Link></td>
                 <td>{course.category}</td>
                 <td>{course.price} PLN</td>
                 <td>{course.duration}</td>
-                <td>{course.rating}</td>
+                <td>
+                  <Star rating ={course.rating} 
+                  onClicked={(rating) => onStarRatingClicked(rating)} />
+                  </td>
+                  <td>
+                  <span
+                    className="fas fa-times delete"
+                    onClick={() => deleteCourseById(course.id)}
+                  ></span>
+                </td>
               </tr>
             );
           })}

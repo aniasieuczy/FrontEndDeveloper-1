@@ -1,0 +1,15 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "workshop for front-end developer",
+  "main": "index.js",
+  "scripts": {
+    "prestart:api" :"node server/createMockDb.js",
+    "start:api":"node server/webApiServer.js"
+  },
+  "author": "Anna Szpecht",
+  "license": "ISC",
+  "dependencies": {
+    "json-server": "0.17.0"
+  }
+}
